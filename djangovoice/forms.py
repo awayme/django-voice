@@ -40,6 +40,7 @@ class FeedbackForm(forms.ModelForm):
 
         if 'email' in self.fields.keys():
             self.fields['email'].widget.attrs.update({'placeholder':"your@email.com"})
+            self.fields['email'].required = True
 
     def clean(self):
         cleaned_data = super(FeedbackForm, self).clean()
