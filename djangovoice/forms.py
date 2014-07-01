@@ -16,6 +16,7 @@ class FeedbackForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
+        # self.private = kwargs.pop('private', None)
         super(FeedbackForm, self).__init__(*args, **kwargs)
 
         # add class to fix width of title input and textarea:
@@ -27,7 +28,8 @@ class FeedbackForm(forms.ModelForm):
         if self.user is not None and self.user.is_authenticated():
             deleted_fields = ['email']
         else:
-            deleted_fields = ['anonymous', 'private']
+            deleted_fields = ['anonymous']
+            # deleted_fields = ['anonymous', 'private']
 
         for field_name in deleted_fields:
             del self.fields[field_name]
@@ -35,6 +37,9 @@ class FeedbackForm(forms.ModelForm):
         # add tabindex attribute to fields:
         for index, field in enumerate(self.fields.values(), 1):
             field.widget.attrs.update({'tabindex': index})
+
+        if 'email' in self.fields.keys():
+            self.fields['email'].widget.attrs.update({'placeholder':"your@email.com"})
 
     def clean(self):
         cleaned_data = super(FeedbackForm, self).clean()

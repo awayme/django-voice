@@ -164,6 +164,9 @@ class FeedbackSubmitView(VoiceMixin, FormView):
     def get_context_data(self, **kwargs):
         return super(FeedbackSubmitView, self).get_context_data(**kwargs)
 
+    # def get_initial(self):
+    #     return { 'title': 'foo', 'description':'text', 'type':1, 'private': True }
+
     def dispatch(self, request, *args, **kwargs):
         # if project doesn't allow anonymous user submission, check
         # authentication:
@@ -171,6 +174,15 @@ class FeedbackSubmitView(VoiceMixin, FormView):
                 and not request.user.is_authenticated()):
             login_url = reverse('django.contrib.auth.views.login')
             return redirect(login_url + '?next=%s' % request.path)
+
+        privatemod = request.GET.get("private", None)
+        if privatemod:
+            # super(FeedbackSubmitView, self).get_form_kwargs().update({"private":True})
+            try:
+                from djangovoice.settings import PRIVATE_TITLE, PRIVATE_DESCRIPTION, PRIVATE_TYPE
+                self.initial = { 'title': PRIVATE_TITLE, 'description': PRIVATE_DESCRIPTION, 'type':PRIVATE_TYPE, 'private': True }
+            except:
+                print "PRIVATE_TITLE, PRIVATE_DESCRIPTION, PRIVATE_TYPE not set"
 
         return super(FeedbackSubmitView, self).dispatch(
             request, *args, **kwargs)
@@ -180,6 +192,7 @@ class FeedbackSubmitView(VoiceMixin, FormView):
         # authentication.
         kwargs = super(FeedbackSubmitView, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
+        # kwargs.update({"private":True})
 
         return kwargs
 
@@ -187,7 +200,7 @@ class FeedbackSubmitView(VoiceMixin, FormView):
         feedback = form.save(commit=False)
 
         if self.request.user.is_anonymous() and ALLOW_ANONYMOUS_USER_SUBMIT:
-            feedback.private = True
+            #feedback.private = True
             feedback.anonymous = True
 
         elif not form.cleaned_data.get('anonymous', False):
