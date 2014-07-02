@@ -42,6 +42,20 @@ class FeedbackForm(forms.ModelForm):
             self.fields['email'].widget.attrs.update({'placeholder':"your@email.com"})
             self.fields['email'].required = True
 
+    def save(self, commit=True):
+        from django.conf import settings
+        from django.core.mail import send_mail
+
+        recipient_list = [manager_tuple[1] for manager_tuple in settings.MANAGERS]
+        subject = 'New feedbak posted'
+        message = "" 
+        for k,v in self.cleaned_data.items():
+            message = "%s\n%s |: %s" % (message, k, v)
+        # print subject,message,settings.DEFAULT_FROM_EMAIL, recipient_list
+        # print send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=True)
+
+        return super(FeedbackForm, self).save(commit)
+
     def clean(self):
         cleaned_data = super(FeedbackForm, self).clean()
 
