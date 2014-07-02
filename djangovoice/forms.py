@@ -52,7 +52,7 @@ class FeedbackForm(forms.ModelForm):
         for k,v in self.cleaned_data.items():
             message = "%s\n%s |: %s" % (message, k, v)
         # print subject,message,settings.DEFAULT_FROM_EMAIL, recipient_list
-        # print send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=True)
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=True)
 
         return super(FeedbackForm, self).save(commit)
 
